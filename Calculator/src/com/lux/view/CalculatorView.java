@@ -1,22 +1,6 @@
 package com.lux.view;
 
-import com.lux.calculation.ActionChoser;
-
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
-
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -24,223 +8,253 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+
+import com.lux.calculation.Action;
 
 public class CalculatorView {
 
-	private static final byte ASCII_CODE_ZERO = 48;
-	private static final byte ASCII_CODE_NINE = 57;
-	private static final byte ASCII_CODE_DOT = 46;
-	private static final byte ASCII_CODE_MINUS = 45;
+    private static final byte ASCII_CODE_DOT = 46;
+    private static final byte ASCII_CODE_MINUS = 45;
 
-	private static final String CALC = "Calculator";
-	private static final String CALCULATE = "Calculate";
-	private static final String RESULT = "Result : ";
-	private static final String HISTORY = "History";
-	private static final String CALCULATE_ON_THE_FLY = "calculate on the fly";
-	private static final String[] ACTIONS = { "+", "-", "*", "/" };
+    private static final String CALC = "Calculator";
+    private static final String CALCULATE = "Calculate";
+    private static final String RESULT = "Result : ";
+    private static final String HISTORY = "History";
+    private static final String CALCULATE_ON_THE_FLY = "calculate on the fly";
 
-	private Display display;
-	private Shell shell;
-	private GridLayout gridlayout;
-	private RowLayout rowlayout;
-	private Composite composite1, composite2, composite3;
-	private TabFolder tabfolder;
-	private Text text, text1;
-	private Button checkbox, calculateButton;
-	private Label resultlabel, resultlabel1;
-	private Table table;
-	private Combo combo;
+    private Display display;
+    private Shell shell;
+    private GridLayout gridlayout;
+    private RowLayout rowlayout;
+    private Composite composite1, composite2, composite3;
+    private TabFolder tabfolder;
+    private Text textArg1, textArg2;
+    private Button checkbox, calculateButton;
+    private Label resultLabelTitle, resultLabelValue;
+    private Table table;
+    private Combo combo;
 
-	public void initUI() {
-		display = new Display();
-		shell = new Shell(display);
-		shell.setSize(350, 320);
-		shell.setText(CALC);
+    public void initUI() {
+        display = new Display();
+        shell = new Shell(display);
+        shell.setSize(350, 320);
+        shell.setText(CALC);
 
-		gridlayout = new GridLayout();
-		rowlayout = new RowLayout();
+        gridlayout = new GridLayout();
+        rowlayout = new RowLayout();
 
-		gridlayout.numColumns = 1;
-		shell.setLayout(gridlayout);
+        gridlayout.numColumns = 1;
+        shell.setLayout(gridlayout);
 
-		rowlayout = new RowLayout();
-		rowlayout.wrap = false;
+        rowlayout = new RowLayout();
+        rowlayout.wrap = false;
 
-		tabfolder = new TabFolder(shell, SWT.NULL);
-		tabfolder.setLayoutData(new GridData(300, 200));
-		TabItem tabItem = new TabItem(tabfolder, SWT.NULL);
-		tabItem.setText(CALC);
+        tabfolder = new TabFolder(shell, SWT.NULL);
+        tabfolder.setLayoutData(new GridData(300, 200));
+        TabItem tabItem = new TabItem(tabfolder, SWT.NULL);
+        tabItem.setText(CALC);
 
-		SashForm sashForm = new SashForm(tabfolder, SWT.VERTICAL);
-		tabItem.setControl(sashForm);
+        SashForm sashForm = new SashForm(tabfolder, SWT.VERTICAL);
+        tabItem.setControl(sashForm);
 
-		composite1 = new Composite(sashForm, SWT.NONE);
-		composite1.setLayout(rowlayout);
-		composite2 = new Composite(sashForm, SWT.NONE);
-		composite2.setLayout(rowlayout);
-		composite3 = new Composite(sashForm, SWT.NONE);
-		composite3.setLayout(rowlayout);
+        composite1 = new Composite(sashForm, SWT.NONE);
+        composite1.setLayout(rowlayout);
+        composite2 = new Composite(sashForm, SWT.NONE);
+        composite2.setLayout(rowlayout);
+        composite3 = new Composite(sashForm, SWT.NONE);
+        composite3.setLayout(rowlayout);
 
-		text = new Text(composite1, SWT.BORDER | SWT.RIGHT);
-		text.setLayoutData(new RowData(110, 20));
+        textArg1 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
+        textArg1.setLayoutData(new RowData(110, 20));
 
-		combo = new Combo(composite1, SWT.DROP_DOWN | SWT.READ_ONLY);
-		combo.setItems(ACTIONS);
-		combo.setText(ACTIONS[0]);
+        combo = new Combo(composite1, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-		text1 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
-		text1.setLayoutData(new RowData(110, 20));
+        combo.setItems(getActionsTitles());
+        combo.setText(Action.ADD.getTitle());
 
-		checkbox = new Button(composite2, SWT.CHECK);
-		checkbox.setLayoutData(new RowData(150, 35));
-		checkbox.setText(CALCULATE_ON_THE_FLY);
+        textArg2 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
+        textArg2.setLayoutData(new RowData(110, 20));
 
-		resultlabel = new Label(composite3, SWT.NULL);
-		resultlabel.setText(RESULT);
+        checkbox = new Button(composite2, SWT.CHECK);
+        checkbox.setLayoutData(new RowData(150, 35));
+        checkbox.setText(CALCULATE_ON_THE_FLY);
 
-		resultlabel1 = new Label(composite3, SWT.BORDER | SWT.RIGHT);
-		resultlabel1.setLayoutData(new RowData(240, 20));
+        resultLabelTitle = new Label(composite3, SWT.NULL);
+        resultLabelTitle.setText(RESULT);
 
-		calculateButton = new Button(composite2, SWT.PUSH);
-		calculateButton.setText(CALCULATE);
-		calculateButton.setLayoutData(new RowData(140, 35));
+        resultLabelValue = new Label(composite3, SWT.BORDER | SWT.RIGHT);
+        resultLabelValue.setLayoutData(new RowData(240, 20));
 
-		checkbox.addSelectionListener(checkBoxSelectionAdapter);
+        calculateButton = new Button(composite2, SWT.PUSH);
+        calculateButton.setText(CALCULATE);
+        calculateButton.setLayoutData(new RowData(140, 35));
 
-		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
-		tabItem1.setText(HISTORY);
+        checkbox.addSelectionListener(checkBoxSelectionAdapter);
 
-		SashForm sashForm1 = new SashForm(tabfolder, SWT.VERTICAL);
-		tabItem1.setControl(sashForm1);
+        TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
+        tabItem1.setText(HISTORY);
 
-		table = new Table(sashForm1, SWT.FULL_SELECTION | SWT.BORDER | SWT.SCROLL_LINE);
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+        SashForm sashForm1 = new SashForm(tabfolder, SWT.VERTICAL);
+        tabItem1.setControl(sashForm1);
 
-		TableColumn column = new TableColumn(table, SWT.CENTER);
+        table = new Table(sashForm1, SWT.FULL_SELECTION | SWT.BORDER | SWT.SCROLL_LINE);
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
-		column.setWidth(295);
-		column.setText("                                         " + HISTORY);
+        TableColumn column = new TableColumn(table, SWT.CENTER);
 
-		calculateButton.addSelectionListener(calculateButtonAdapter);
+        column.setWidth(295);
+        column.setText("                                         " + HISTORY);
 
-		text.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				checker(text);
-			}
-		});
-		text1.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				checker(text1);
-			}
-		});
-		combo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				onFlychecker();
-			}
-		});
-		shell.setVisible(true);
-		shell.open();
+        calculateButton.addSelectionListener(calculateButtonAdapter);
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
-	}
+        textArg1.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                checker(textArg1);
+            }
+        });
+        textArg2.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                checker(textArg2);
+            }
+        });
+        combo.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                onFlychecker();
+            }
+        });
+        
+        
+        
+        shell.setVisible(true);
+        shell.open();
 
-	private void checker(Text text) {
-		try {
-			Double.parseDouble(text.getText());
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch())
+                display.sleep();
+        }
+        display.dispose();
+    }
 
-		} catch (NumberFormatException ex) {
-			checkTextFild(text);
-			onFlychecker();
-		}
-		try {
-			Double.parseDouble(text1.getText());
-			onFlychecker();
+    private void checker(Text text) {
+        try {
+            Double.parseDouble(text.getText());
 
-		} catch (NumberFormatException ex) {
-			checkTextFild(text1);
-		}
-	}
+        } catch (NumberFormatException ex) {
+            checkTextFild(text);
+            onFlychecker();
+        }
+        try {
+            Double.parseDouble(textArg2.getText());
+            onFlychecker();
 
-	private void checkTextFild(Text text) {
-		char[] value = text.getText().toCharArray();
-		char[] temp = new char[value.length];
-		int count = 0;
-		boolean flag = false;
-		for (int i = 0; i < value.length; i++) {
-			if (!(value[i] < ASCII_CODE_ZERO || value[i] > ASCII_CODE_NINE)) {
-				temp[count] = value[i];
-				count++;
-			} else if (value[i] == ASCII_CODE_DOT) {
-				for (int j = 0; j < value.length; j++) {
-					if (!flag && value[j] == ASCII_CODE_DOT) {
-						flag = true;
-						temp[count] = value[j];
-						count++;
-						break;
-					}
-				}
-			} else if (value[0] == ASCII_CODE_MINUS) {
-				temp[0] = ASCII_CODE_MINUS;
-				count++;
-			} else {
-				continue;
-			}
-		}
-		text.setText(new String(temp));
-		text.setSelection(text.getText().length());
-		onFlychecker();
+        } catch (NumberFormatException ex) {
+            checkTextFild(textArg2);
+        }
+    }
 
-	}
+    private void checkTextFild(Text text) {
+        char[] value = text.getText().toCharArray();
+        char[] temp = new char[value.length];
+        int count = 0;
+        boolean dotPresent = false;
+        for (int i = 0; i < value.length; i++) {
+            if (i == 0 && value[i] == ASCII_CODE_MINUS) {
+                temp[count] = ASCII_CODE_MINUS;
+                count++;
+            } else if (Character.isDigit(value[i])) {
+                temp[count] = value[i];
+                count++;
+            } else if (value[i] == ASCII_CODE_DOT) {
+                if (!dotPresent) {
+                    dotPresent = true;
+                    temp[count] = value[i];
+                    count++;
+                }
+            }
+        }
+        int cursorPos = text.getCaretPosition();
+        text.setText(new String(temp));
+        text.setSelection(cursorPos - 1);
+        onFlychecker();
+    }
 
-	private void onFlychecker() {
-		if (checkbox.getSelection()) {
+    private void onFlychecker() {
+        if (checkbox.getSelection()) {
+            resultLabelValue.setText(callCalculate());
+        }
+    }
 
-			resultlabel1
-					.setText(ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
-		}
-	}
+    private double getDouble(Text text) {
+        double data = 0;
+        try {
+            data = Double.parseDouble(text.getText());
+        } catch (NumberFormatException ex) {
+            data = 0;
+        }
+        return data;
+    }
 
-	private double getDouble(Text text) {
-		double data = 0;
-		try {
-			data = Double.parseDouble(text.getText());
+    private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+            String value = callCalculate();
+            resultLabelValue.setText(value);
 
-		} catch (NumberFormatException ex) {
-			data = 0;
-		}
-		return data;
-	}
+            TableItem item = new TableItem(table, SWT.NONE);
+            item.setText(new String[] { value });
 
-	private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
-		public void widgetSelected(SelectionEvent e) {
-			resultlabel1
-					.setText(ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(new String[] {
-					ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "" });
+        }
+    };
 
-		}
-	};
+    private SelectionAdapter checkBoxSelectionAdapter = new SelectionAdapter() {
 
-	private SelectionAdapter checkBoxSelectionAdapter = new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+            if (checkbox.getSelection()) {
+                calculateButton.setEnabled(false);
+                resultLabelValue.setText(callCalculate());
+            } else {
+                calculateButton.setEnabled(true);
+            }
+        }
+    };
 
-		public void widgetSelected(SelectionEvent e) {
-			if (checkbox.getSelection()) {
-				calculateButton.setEnabled(false);
-				resultlabel1.setText(
-						ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
-			} else {
-				calculateButton.setEnabled(true);
+    private String callCalculate() {
+        Action action = getActionByTitle(combo.getText());
+        return action.calcExecute(getDouble(textArg1), getDouble(textArg2)) + ""; 
+    }
 
-			}
-		}
-	};
+    private String[] getActionsTitles() {
+        Action[] actions = Action.values();
+        String[] result = new String[actions.length];
+        for (int i = 0; i < actions.length; i++) {
+            Action action = actions[i];
+            result[i] = action.getTitle();
+        }
+        return result;
+    }
 
+    private Action getActionByTitle(String title) {
+        Action[] actions = Action.values();
+        for (int i = 0; i < actions.length; i++) {
+            Action action = actions[i];
+            if (action.getTitle().equals(title)) {
+                return action;
+            }
+        }
+        throw new RuntimeException("ewfewfrewfrewf");
+    }
 }
