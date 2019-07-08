@@ -39,7 +39,7 @@ public class CalculatorView {
 	private static final String RESULT = "Result : ";
 	private static final String HISTORY = "History";
 	private static final String CALCULATE_ON_THE_FLY = "calculate on the fly";
-	private static final String[] actions = { "+", "-", "*", "/" };
+	private static final String[] ACTIONS = { "+", "-", "*", "/" };
 
 	private Display display;
 	private Shell shell;
@@ -87,8 +87,8 @@ public class CalculatorView {
 		text.setLayoutData(new RowData(110, 20));
 
 		combo = new Combo(composite1, SWT.DROP_DOWN | SWT.READ_ONLY);
-		combo.setItems(actions);
-		combo.setText(actions[0]);
+		combo.setItems(ACTIONS);
+		combo.setText(ACTIONS[0]);
 
 		text1 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
 		text1.setLayoutData(new RowData(110, 20));
@@ -124,16 +124,8 @@ public class CalculatorView {
 		column.setWidth(295);
 		column.setText("                                         " + HISTORY);
 
-		calculateButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				resultlabel1
-				.setText(ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
-				TableItem item = new TableItem(table, SWT.NONE);
-				item.setText(new String[] { ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + ""});
-				
-			}
-		});
-				
+		calculateButton.addSelectionListener(calculateButtonAdapter);
+
 		text.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				checker(text);
@@ -146,7 +138,7 @@ public class CalculatorView {
 		});
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				onFlychecker() ;
+				onFlychecker();
 			}
 		});
 		shell.setVisible(true);
@@ -225,20 +217,30 @@ public class CalculatorView {
 		}
 		return data;
 	}
-	
-	
+
+	private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
+		public void widgetSelected(SelectionEvent e) {
+			resultlabel1
+					.setText(ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
+			TableItem item = new TableItem(table, SWT.NONE);
+			item.setText(new String[] {
+					ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "" });
+
+		}
+	};
+
 	private SelectionAdapter checkBoxSelectionAdapter = new SelectionAdapter() {
-	
+
 		public void widgetSelected(SelectionEvent e) {
 			if (checkbox.getSelection()) {
 				calculateButton.setEnabled(false);
-				resultlabel1
-				.setText(ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
+				resultlabel1.setText(
+						ActionChoser.action(getDouble(text), getDouble(text1), combo.getSelectionIndex()) + "");
 			} else {
 				calculateButton.setEnabled(true);
 
 			}
 		}
 	};
-	
+
 }
