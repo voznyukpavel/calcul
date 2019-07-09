@@ -4,8 +4,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -14,7 +18,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -24,11 +30,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.lux.calculation.Action;
+import com.lux.util.GetDataAndAction;
+import com.lux.util.TextChecker;
 
 public class CalculatorView {
-
-	private static final byte ASCII_CODE_DOT = 46;
-	private static final byte ASCII_CODE_MINUS = 45;
 
 	private static final String CALC = "Calculator";
 	private static final String CALCULATE = "Calculate";
@@ -83,7 +88,7 @@ public class CalculatorView {
 
 		combo = new Combo(composite1, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-		combo.setItems(getActionsTitles());
+		combo.setItems(GetDataAndAction.getActionsTitles());
 		combo.setText(Action.ADD.getTitle());
 
 		textArg2 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
@@ -127,73 +132,31 @@ public class CalculatorView {
 				checker(textArg1);
 			}
 		});
+
 		textArg2.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
+
 				checker(textArg2);
 			}
 		});
+
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				onFlychecker();
 			}
 		});
 
-		shell.setVisible(true);
-		shell.open();
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
 	}
 
-	private void checker(Text text) {
-		try {
-			Double.parseDouble(text.getText());
+	private boolean checker(Text text) {
 
-		} catch (NumberFormatException ex) {
-			checkerTextFild(text);
-			onFlychecker();
-		}
-		try {
-			Double.parseDouble(textArg2.getText());
-			onFlychecker();
-
-		} catch (NumberFormatException ex) {
-			checkerTextFild(textArg2);
-		}
-	}
-
-	private void checkerTextFild(Text text) {
-		char[] value = text.getText().toCharArray();
-		char[] temp = checkTextFild(value);
-		int cursorPos = text.getCaretPosition();
-		text.setText(new String(temp));
-		text.setSelection(cursorPos - 1);
+		String textValue = text.getText();
+		char[] value = textValue.toCharArray();
+		String checked = TextChecker.checkTextFild(value);
+		text.setText(checked);
+		text.setSelection(text.getText().length());
 		onFlychecker();
-	}
-
-	private char[] checkTextFild(char[] value) {
-		char[] temp = new char[value.length];
-		int count = 0;
-		boolean dotPresent = false;
-		for (int i = 0; i < value.length; i++) {
-			if (i == 0 && value[i] == ASCII_CODE_MINUS) {
-				temp[count] = ASCII_CODE_MINUS;
-				count++;
-			} else if (Character.isDigit(value[i])) {
-				temp[count] = value[i];
-				count++;
-			} else if (value[i] == ASCII_CODE_DOT) {
-				if (!dotPresent) {
-					dotPresent = true;
-					temp[count] = value[i];
-					count++;
-				}
-			}
-		}
-		return temp;
+		return true;
 	}
 
 	private void onFlychecker() {
@@ -202,29 +165,22 @@ public class CalculatorView {
 		}
 	}
 
-	private double getDouble(Text text) {
-		double data = 0;
-		try {
-			data = Double.parseDouble(text.getText());
-		} catch (NumberFormatException ex) {
-			data = 0;
-		}
-		return data;
+	private String callCalculate() {
+		Action action = GetDataAndAction.getActionByTitle(combo.getText());
+		return action.calcExecute(GetDataAndAction.getDouble(textArg1.getText()),
+				GetDataAndAction.getDouble(textArg2.getText())) + "";
 	}
 
 	private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
 		public void widgetSelected(SelectionEvent e) {
 			String value = callCalculate();
 			resultLabelValue.setText(value);
-
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(new String[] { value });
-
 		}
 	};
 
 	private SelectionAdapter checkBoxSelectionAdapter = new SelectionAdapter() {
-
 		public void widgetSelected(SelectionEvent e) {
 			if (checkbox.getSelection()) {
 				calculateButton.setEnabled(false);
@@ -235,29 +191,15 @@ public class CalculatorView {
 		}
 	};
 
-	private String callCalculate() {
-		Action action = getActionByTitle(combo.getText());
-		return action.calcExecute(getDouble(textArg1), getDouble(textArg2)) + "";
+	public void drawWindow() {
+		shell.pack();
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+		display.dispose();
+
 	}
 
-	private String[] getActionsTitles() {
-		Action[] actions = Action.values();
-		String[] result = new String[actions.length];
-		for (int i = 0; i < actions.length; i++) {
-			Action action = actions[i];
-			result[i] = action.getTitle();
-		}
-		return result;
-	}
-
-	private Action getActionByTitle(String title) {
-		Action[] actions = Action.values();
-		for (int i = 0; i < actions.length; i++) {
-			Action action = actions[i];
-			if (action.getTitle().equals(title)) {
-				return action;
-			}
-		}
-		throw new RuntimeException("ewfewfrewfrewf");
-	}
 }
