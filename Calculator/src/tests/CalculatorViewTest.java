@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -17,12 +20,10 @@ class CalculatorViewTest {
 	@Test
 	void testcheckTextFildNumbersVsLatersInEnd() throws NoSuchMethodException, SecurityException,
 			IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		Method method = CalculatorView.class.getDeclaredMethod("checkTextFild", Text.class);
+		Method method = CalculatorView.class.getDeclaredMethod("checkTextFild",(char[].class));
 		method.setAccessible(true);
-		Text arg1 = new Text(new Shell(), 0);
-		arg1.setText("454jkjk");
-		String output = (String) method.invoke(calculatorview, arg1);
-		assertEquals(output, "454");
+		char[] output = (char[]) method.invoke(calculatorview, "454jkjk".toCharArray());
+		assertEquals(output,"454".toCharArray());
 	}
 
 	void testcheckTextFildNumbersVsLatersInTheCenter() throws NoSuchMethodException, SecurityException,
