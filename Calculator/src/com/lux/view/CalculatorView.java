@@ -4,12 +4,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
+
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -18,9 +16,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
+
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -135,13 +133,15 @@ public class CalculatorView {
 
 		textArg2.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-
+				checkDividingByZero();
 				checker(textArg2);
+
 			}
 		});
 
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				checkDividingByZero();
 				onFlychecker();
 			}
 		});
@@ -190,6 +190,17 @@ public class CalculatorView {
 			}
 		}
 	};
+
+	private void checkDividingByZero() {
+		if (textArg2.getText().equals("0") && combo.getText().equals("/") ) {
+			System.out.println(textArg2.getText());
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
+			dialog.setText("Incorect insertion");
+			dialog.setMessage("Divding by zero is forbidden");
+			dialog.open();
+			textArg2.setText("");
+		}
+	}
 
 	public void drawWindow() {
 		shell.pack();
