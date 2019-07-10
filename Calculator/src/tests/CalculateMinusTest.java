@@ -1,12 +1,19 @@
 package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import com.lux.calculation.CalculateMinus;
 
 class CalculateMinusTest {
-	private final CalculateMinus calculateminus = new CalculateMinus();
 
+	private static CalculateMinus calculateminus;
+
+	@BeforeAll
+	static void init() {
+		calculateminus = new CalculateMinus();
+	}
 	@Test
 	void minus() {
 		assertEquals(0, calculateminus.act(1, 1));

@@ -130,6 +130,8 @@ class CalculatorViewTest {
 		
 
 		boolean output = (boolean) method.invoke(null, input.toCharArray());
+		
+		
 		assertEquals(output, requiredOutput);
 	}
 

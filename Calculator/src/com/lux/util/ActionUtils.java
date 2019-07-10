@@ -2,8 +2,9 @@ package com.lux.util;
 
 import com.lux.calculation.Action;
 
-public class GetDataAndAction {
-	private GetDataAndAction() {
+public class ActionUtils {
+	
+	private ActionUtils() {
 	}
 
 	public static Action getActionByTitle(String title) {

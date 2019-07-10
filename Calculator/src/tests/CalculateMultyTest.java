@@ -2,14 +2,21 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.lux.calculation.CalculateMulty;
 
 class CalculateMultyTest {
-	private final CalculateMulty calculatemulty = new CalculateMulty();
-	
+
+	private static CalculateMulty calculatemulty;
+
+	@BeforeAll
+	static void init() {
+		calculatemulty = new CalculateMulty();
+		
+	}
 	@DisplayName("multy 1 vs 1")
 	@Test
 	void multy() {

@@ -1,23 +1,20 @@
 package com.lux.view;
 
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.custom.SashForm;
-
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.layout.FillLayout;
-
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -27,8 +24,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.lux.calculation.Action;
-import com.lux.dilog.DividedByZeroDialog;
-import com.lux.util.GetDataAndAction;
+import com.lux.util.ActionUtils;
 import com.lux.util.TextChecker;
 
 public class CalculatorView {
@@ -51,7 +47,7 @@ public class CalculatorView {
 	private Table table;
 	private Combo combo;
 
-	public void initUICalculator() {
+	private void initUICalculator() {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setText(CALC);
@@ -69,8 +65,10 @@ public class CalculatorView {
 
 		arguments = new Composite(sashForm, SWT.NONE);
 		arguments.setLayout(rowlayout);
+
 		actions = new Composite(sashForm, SWT.NONE);
 		actions.setLayout(rowlayout);
+
 		result = new Composite(sashForm, SWT.NONE);
 		result.setLayout(rowlayout);
 
@@ -79,16 +77,13 @@ public class CalculatorView {
 		rowdata.height = 20;
 
 		textArg1 = new Text(arguments, SWT.BORDER | SWT.RIGHT);
-
 		textArg1.setLayoutData(rowdata);
 
 		combo = new Combo(arguments, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-		combo.setItems(GetDataAndAction.getActionsTitles());
+		combo.setItems(ActionUtils.getActionsTitles());
 		combo.setText(Action.ADD.getTitle());
 
 		textArg2 = new Text(arguments, SWT.BORDER | SWT.RIGHT);
-
 		textArg2.setLayoutData(rowdata);
 
 		checkbox = new Button(actions, SWT.CHECK);
@@ -118,50 +113,19 @@ public class CalculatorView {
 
 		calculateButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
 				setResult();
 			}
 		});
-		textArg1.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				onFlychecker();
-			}
 
-			public void keyPressed(KeyEvent e) {
-				if (!TextChecker.checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
-						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
-					e.doit = false;
-				}
-				textArg1.getCaretPosition();
-				onFlychecker();
-			}
-
-		});
-
-		textArg2.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
-				onFlychecker();
-			}
-
-			public void keyPressed(KeyEvent e) {
-				if (!TextChecker.checker(textArg2.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
-						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
-					e.doit = false;
-				}
-				textArg2.getCaretPosition();
-			}
-		});
+		textArg1.addKeyListener(listener);
+		textArg2.addKeyListener(listener);
 
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
 				onFlychecker();
 			}
 		});
 	}
-
-
 
 	private void onFlychecker() {
 		if (checkbox.getSelection()) {
@@ -170,6 +134,11 @@ public class CalculatorView {
 	}
 
 	private void setResult() {
+		
+		if (!checkDividingByZero(shell, textArg2.getText(), combo.getText())) {
+			return;
+		}
+		
 		String value = callCalculate();
 		resultLabelValue.setText(value);
 		TableItem item = new TableItem(table, SWT.NONE);
@@ -184,12 +153,12 @@ public class CalculatorView {
 	}
 
 	private String callCalculate() {
-		Action action = GetDataAndAction.getActionByTitle(combo.getText());
-		return action.calcExecute(GetDataAndAction.getDouble(textArg1.getText()),
-				GetDataAndAction.getDouble(textArg2.getText())) + "";
+		Action action = ActionUtils.getActionByTitle(combo.getText());
+		return action.calcExecute(ActionUtils.getDouble(textArg1.getText()), ActionUtils.getDouble(textArg2.getText()))
+				+ "";
 	}
 
-	public void initHistory() {
+	private void initHistory() {
 		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
 		tabItem1.setText(HISTORY);
 		SashForm sashForm1 = new SashForm(tabfolder, SWT.HORIZONTAL);
@@ -201,14 +170,12 @@ public class CalculatorView {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(TABLE_HEADER[i]);
 		}
-
 		for (int i = 0; i < TABLE_HEADER.length; i++) {
 			table.getColumn(i).pack();
 		}
-
 	}
 
-	public void drawWindow() {
+	private void drawWindow() {
 		shell.pack();
 		shell.open();
 		while (!shell.isDisposed()) {
@@ -217,4 +184,37 @@ public class CalculatorView {
 		}
 		display.dispose();
 	}
+
+	private boolean checkDividingByZero(Shell shell, String text, String actionTitle) {
+		if (actionTitle.equals(Action.DIV.getTitle()) && ActionUtils.getDouble(text) == 0) {
+			System.out.println(ActionUtils.getDouble(text));
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
+			dialog.setText("Incorect insertion");
+			dialog.setMessage("Divding by zero is forbidden");
+			dialog.open();
+			return false;
+		}
+		return true;
+	}
+
+	KeyAdapter listener = new KeyAdapter() {
+
+		public void keyPressed(KeyEvent e) {
+			Text text = (Text) e.widget;
+			if (!TextChecker.checker(text.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
+					&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
+				e.doit = false;
+			}
+			text.getCaretPosition();
+			onFlychecker();
+		}
+
+	};
+
+	public void open() {
+		initUICalculator();
+		initHistory();
+		drawWindow();
+	}
+
 }
