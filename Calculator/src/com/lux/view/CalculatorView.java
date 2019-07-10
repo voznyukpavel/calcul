@@ -138,10 +138,13 @@ public class CalculatorView {
 		});
 
 		textArg2.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				checkDividingByZero();
-				// checker(textArg2);
-
+			public void keyPressed(KeyEvent e) {
+				if (!checker(textArg2.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
+						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
+					e.doit = false;
+				}
+				textArg2.getCaretPosition();
+				onFlychecker();
 			}
 		});
 
@@ -155,12 +158,9 @@ public class CalculatorView {
 	}
 
 	private boolean checker(String text) {
-
 		String textValue = text;
 		char[] value = textValue.toCharArray();
 		return TextChecker.checkTextFild(value);
-		// text.setSelection(text.getText().length());
-		// onFlychecker();
 	}
 
 	private void onFlychecker() {

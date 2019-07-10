@@ -10,7 +10,6 @@ public class TextChecker {
     	
     }
 	public static boolean checkTextFild(char[] value) {
-
 		boolean process=false;
 		boolean dotPresent = false;
 		boolean minusPresent=false;
