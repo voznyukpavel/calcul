@@ -8,7 +8,8 @@ public class CalculatorApp {
 
 	public static void main(String[] args) {
 		calculatorview=new CalculatorView();
-		calculatorview.initUI();
+		calculatorview.initUICalculator();
+		calculatorview.initHistory();
 		calculatorview.drawWindow();
 	}
 }

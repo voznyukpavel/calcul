@@ -1,10 +1,11 @@
 package com.lux.view;
 
 import org.eclipse.swt.SWT;
+
 import org.eclipse.swt.custom.SashForm;
+
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
@@ -12,13 +13,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.FillLayout;
+
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -28,6 +29,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.lux.calculation.Action;
+import com.lux.dilog.DividedByZeroDialog;
 import com.lux.util.GetDataAndAction;
 import com.lux.util.TextChecker;
 
@@ -42,6 +44,7 @@ public class CalculatorView {
 	private Display display;
 	private Shell shell;
 	private GridLayout gridlayout;
+	private FillLayout filllayout;
 	private RowLayout rowlayout;
 	private Composite composite1, composite2, composite3;
 	private TabFolder tabfolder;
@@ -51,7 +54,7 @@ public class CalculatorView {
 	private Table table;
 	private Combo combo;
 
-	public void initUI() {
+	public void initUICalculator() {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setSize(350, 320);
@@ -59,6 +62,7 @@ public class CalculatorView {
 
 		gridlayout = new GridLayout();
 		rowlayout = new RowLayout();
+		
 
 		gridlayout.numColumns = 1;
 		shell.setLayout(gridlayout);
@@ -70,7 +74,7 @@ public class CalculatorView {
 		tabfolder.setLayoutData(new GridData(300, 200));
 		TabItem tabItem = new TabItem(tabfolder, SWT.NULL);
 		tabItem.setText(CALC);
-
+		
 		SashForm sashForm = new SashForm(tabfolder, SWT.VERTICAL);
 		tabItem.setControl(sashForm);
 
@@ -80,6 +84,8 @@ public class CalculatorView {
 		composite2.setLayout(rowlayout);
 		composite3 = new Composite(sashForm, SWT.NONE);
 		composite3.setLayout(rowlayout);
+		
+
 
 		textArg1 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
 		textArg1.setLayoutData(new RowData(110, 20));
@@ -108,25 +114,13 @@ public class CalculatorView {
 
 		checkbox.addSelectionListener(checkBoxSelectionAdapter);
 
-		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
-		tabItem1.setText(HISTORY);
-
-		SashForm sashForm1 = new SashForm(tabfolder, SWT.VERTICAL);
-		tabItem1.setControl(sashForm1);
-
-		table = new Table(sashForm1, SWT.FULL_SELECTION | SWT.BORDER | SWT.SCROLL_LINE);
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-
-		TableColumn column = new TableColumn(table, SWT.CENTER);
-
-		column.setWidth(295);
-		column.setText("                                         " + HISTORY);
-
 		calculateButton.addSelectionListener(calculateButtonAdapter);
 
 		textArg1.addKeyListener(new KeyAdapter() {
-
+			
+			public void keyReleased(KeyEvent e) {		
+				onFlychecker();
+			}
 			public void keyPressed(KeyEvent e) {
 				if (!checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
@@ -135,27 +129,33 @@ public class CalculatorView {
 				textArg1.getCaretPosition();
 				onFlychecker();
 			}
+
 		});
 
 		textArg2.addKeyListener(new KeyAdapter() {
+
+			public void keyReleased(KeyEvent e) {
+				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
+				onFlychecker();
+			}
+
 			public void keyPressed(KeyEvent e) {
 				if (!checker(textArg2.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
 					e.doit = false;
 				}
 				textArg2.getCaretPosition();
-				onFlychecker();
 			}
 		});
 
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				checkDividingByZero();
+				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
 				onFlychecker();
 			}
 		});
-
 	}
+
 
 	private boolean checker(String text) {
 		String textValue = text;
@@ -165,8 +165,15 @@ public class CalculatorView {
 
 	private void onFlychecker() {
 		if (checkbox.getSelection()) {
-			resultLabelValue.setText(callCalculate());
+			setResult();
 		}
+	}
+
+	private void setResult() {
+		String value = callCalculate();
+		resultLabelValue.setText(value);
+		TableItem item = new TableItem(table, SWT.NONE);
+		item.setText(new String[] { value });
 	}
 
 	private String callCalculate() {
@@ -177,10 +184,8 @@ public class CalculatorView {
 
 	private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
 		public void widgetSelected(SelectionEvent e) {
-			String value = callCalculate();
-			resultLabelValue.setText(value);
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(new String[] { value });
+			new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
+			setResult();
 		}
 	};
 
@@ -195,15 +200,22 @@ public class CalculatorView {
 		}
 	};
 
-	private void checkDividingByZero() {
-		if (textArg2.getText().equals("0") && combo.getText().equals("/")) {
-			System.out.println(textArg2.getText());
-			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
-			dialog.setText("Incorect insertion");
-			dialog.setMessage("Divding by zero is forbidden");
-			dialog.open();
-			textArg2.setText("");
-		}
+	public void initHistory() {
+		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
+
+		tabItem1.setText(HISTORY);
+
+		SashForm sashForm1 = new SashForm(tabfolder, SWT.VERTICAL);
+		tabItem1.setControl(sashForm1);
+
+		table = new Table(sashForm1, SWT.FULL_SELECTION | SWT.BORDER | SWT.SCROLL_LINE);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		TableColumn column = new TableColumn(table, SWT.CENTER);
+
+		column.setWidth(295);
+		column.setText("                                         " + HISTORY);
 	}
 
 	public void drawWindow() {
@@ -216,5 +228,4 @@ public class CalculatorView {
 		display.dispose();
 
 	}
-
 }
