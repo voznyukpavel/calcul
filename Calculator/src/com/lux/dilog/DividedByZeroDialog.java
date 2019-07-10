@@ -16,7 +16,7 @@ public class DividedByZeroDialog {
 	private void checkDividingByZero(Shell shell,String text,String action) {
 		if (GetDataAndAction.getDouble(text)==0 && action.equals(Action.DIV.getTitle())) {
 			System.out.println(GetDataAndAction.getDouble(text));
-			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);		
 			dialog.setText("Incorect insertion");
 			dialog.setMessage("Divding by zero is forbidden");
 			dialog.open();

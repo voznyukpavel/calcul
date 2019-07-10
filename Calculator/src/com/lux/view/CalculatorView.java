@@ -9,8 +9,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.layout.FillLayout;
@@ -40,13 +38,12 @@ public class CalculatorView {
 	private static final String RESULT = "Result : ";
 	private static final String HISTORY = "History";
 	private static final String CALCULATE_ON_THE_FLY = "calculate on the fly";
+	private static final String[] TABLE_HEADER = { "first num", "action", "second num", " result " };
 
 	private Display display;
 	private Shell shell;
-	private GridLayout gridlayout;
-	private FillLayout filllayout;
 	private RowLayout rowlayout;
-	private Composite composite1, composite2, composite3;
+	private Composite arguments, actions, result;
 	private TabFolder tabfolder;
 	private Text textArg1, textArg2;
 	private Button checkbox, calculateButton;
@@ -57,58 +54,54 @@ public class CalculatorView {
 	public void initUICalculator() {
 		display = new Display();
 		shell = new Shell(display);
-		shell.setSize(350, 320);
 		shell.setText(CALC);
-
-		gridlayout = new GridLayout();
-		rowlayout = new RowLayout();
-		
-
-		gridlayout.numColumns = 1;
-		shell.setLayout(gridlayout);
+		shell.setLayout(new FillLayout());
 
 		rowlayout = new RowLayout();
 		rowlayout.wrap = false;
 
-		tabfolder = new TabFolder(shell, SWT.NULL);
-		tabfolder.setLayoutData(new GridData(300, 200));
-		TabItem tabItem = new TabItem(tabfolder, SWT.NULL);
+		tabfolder = new TabFolder(shell, SWT.NONE);
+		TabItem tabItem = new TabItem(tabfolder, SWT.NONE);
 		tabItem.setText(CALC);
-		
+
 		SashForm sashForm = new SashForm(tabfolder, SWT.VERTICAL);
 		tabItem.setControl(sashForm);
 
-		composite1 = new Composite(sashForm, SWT.NONE);
-		composite1.setLayout(rowlayout);
-		composite2 = new Composite(sashForm, SWT.NONE);
-		composite2.setLayout(rowlayout);
-		composite3 = new Composite(sashForm, SWT.NONE);
-		composite3.setLayout(rowlayout);
-		
+		arguments = new Composite(sashForm, SWT.NONE);
+		arguments.setLayout(rowlayout);
+		actions = new Composite(sashForm, SWT.NONE);
+		actions.setLayout(rowlayout);
+		result = new Composite(sashForm, SWT.NONE);
+		result.setLayout(rowlayout);
 
+		RowData rowdata = new RowData();
+		rowdata.width = 110;
+		rowdata.height = 20;
 
-		textArg1 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
-		textArg1.setLayoutData(new RowData(110, 20));
+		textArg1 = new Text(arguments, SWT.BORDER | SWT.RIGHT);
 
-		combo = new Combo(composite1, SWT.DROP_DOWN | SWT.READ_ONLY);
+		textArg1.setLayoutData(rowdata);
+
+		combo = new Combo(arguments, SWT.DROP_DOWN | SWT.READ_ONLY);
 
 		combo.setItems(GetDataAndAction.getActionsTitles());
 		combo.setText(Action.ADD.getTitle());
 
-		textArg2 = new Text(composite1, SWT.BORDER | SWT.RIGHT);
-		textArg2.setLayoutData(new RowData(110, 20));
+		textArg2 = new Text(arguments, SWT.BORDER | SWT.RIGHT);
 
-		checkbox = new Button(composite2, SWT.CHECK);
-		checkbox.setLayoutData(new RowData(150, 35));
+		textArg2.setLayoutData(rowdata);
+
+		checkbox = new Button(actions, SWT.CHECK);
+		checkbox.setLayoutData(new RowData(150, 70));
 		checkbox.setText(CALCULATE_ON_THE_FLY);
 
-		resultLabelTitle = new Label(composite3, SWT.NULL);
+		resultLabelTitle = new Label(result, SWT.NULL);
 		resultLabelTitle.setText(RESULT);
 
-		resultLabelValue = new Label(composite3, SWT.BORDER | SWT.RIGHT);
+		resultLabelValue = new Label(result, SWT.BORDER | SWT.RIGHT);
 		resultLabelValue.setLayoutData(new RowData(240, 20));
 
-		calculateButton = new Button(composite2, SWT.PUSH);
+		calculateButton = new Button(actions, SWT.PUSH);
 		calculateButton.setText(CALCULATE);
 		calculateButton.setLayoutData(new RowData(140, 35));
 
@@ -117,10 +110,11 @@ public class CalculatorView {
 		calculateButton.addSelectionListener(calculateButtonAdapter);
 
 		textArg1.addKeyListener(new KeyAdapter() {
-			
-			public void keyReleased(KeyEvent e) {		
+
+			public void keyReleased(KeyEvent e) {
 				onFlychecker();
 			}
+
 			public void keyPressed(KeyEvent e) {
 				if (!checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
@@ -156,7 +150,6 @@ public class CalculatorView {
 		});
 	}
 
-
 	private boolean checker(String text) {
 		String textValue = text;
 		char[] value = textValue.toCharArray();
@@ -173,7 +166,13 @@ public class CalculatorView {
 		String value = callCalculate();
 		resultLabelValue.setText(value);
 		TableItem item = new TableItem(table, SWT.NONE);
-		item.setText(new String[] { value });
+		item.setText(new String[] {textArg1.getText(),combo.getText() ,textArg2.getText() ,value });
+		 resizeColumns();
+	}
+	private void resizeColumns() {
+		for (int i = 0; i < TABLE_HEADER.length; i++) {			
+			table.getColumn(i).pack();
+		}
 	}
 
 	private String callCalculate() {
@@ -202,20 +201,21 @@ public class CalculatorView {
 
 	public void initHistory() {
 		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
-
 		tabItem1.setText(HISTORY);
-
-		SashForm sashForm1 = new SashForm(tabfolder, SWT.VERTICAL);
+		SashForm sashForm1 = new SashForm(tabfolder, SWT.HORIZONTAL);
 		tabItem1.setControl(sashForm1);
-
-		table = new Table(sashForm1, SWT.FULL_SELECTION | SWT.BORDER | SWT.SCROLL_LINE);
+	    table = new Table(sashForm1, SWT.BORDER | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+		for (int i = 0; i < TABLE_HEADER.length; i++) {
+			TableColumn column = new TableColumn(table, SWT.NONE);
+			column.setText(TABLE_HEADER[i]);		
+		}
 
-		TableColumn column = new TableColumn(table, SWT.CENTER);
+		for (int i = 0; i < TABLE_HEADER.length; i++) {
+			table.getColumn(i).pack();
+		}
 
-		column.setWidth(295);
-		column.setText("                                         " + HISTORY);
 	}
 
 	public void drawWindow() {
@@ -226,6 +226,5 @@ public class CalculatorView {
 				display.sleep();
 		}
 		display.dispose();
-
 	}
 }
