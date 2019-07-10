@@ -105,18 +105,30 @@ public class CalculatorView {
 		calculateButton.setText(CALCULATE);
 		calculateButton.setLayoutData(new RowData(140, 35));
 
-		checkbox.addSelectionListener(checkBoxSelectionAdapter);
+		checkbox.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (checkbox.getSelection()) {
+					calculateButton.setEnabled(false);
+					setResult();
+				} else {
+					calculateButton.setEnabled(true);
+				}
+			}
+		});
 
-		calculateButton.addSelectionListener(calculateButtonAdapter);
-
+		calculateButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
+				setResult();
+			}
+		});
 		textArg1.addKeyListener(new KeyAdapter() {
-
 			public void keyReleased(KeyEvent e) {
 				onFlychecker();
 			}
 
 			public void keyPressed(KeyEvent e) {
-				if (!checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
+				if (!TextChecker.checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
 					e.doit = false;
 				}
@@ -127,14 +139,13 @@ public class CalculatorView {
 		});
 
 		textArg2.addKeyListener(new KeyAdapter() {
-
 			public void keyReleased(KeyEvent e) {
 				new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
 				onFlychecker();
 			}
 
 			public void keyPressed(KeyEvent e) {
-				if (!checker(textArg2.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
+				if (!TextChecker.checker(textArg2.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
 					e.doit = false;
 				}
@@ -150,11 +161,7 @@ public class CalculatorView {
 		});
 	}
 
-	private boolean checker(String text) {
-		String textValue = text;
-		char[] value = textValue.toCharArray();
-		return TextChecker.checkTextFild(value);
-	}
+
 
 	private void onFlychecker() {
 		if (checkbox.getSelection()) {
@@ -166,11 +173,12 @@ public class CalculatorView {
 		String value = callCalculate();
 		resultLabelValue.setText(value);
 		TableItem item = new TableItem(table, SWT.NONE);
-		item.setText(new String[] {textArg1.getText(),combo.getText() ,textArg2.getText() ,value });
-		 resizeColumns();
+		item.setText(new String[] { textArg1.getText(), combo.getText(), textArg2.getText(), value });
+		resizeColumns();
 	}
+
 	private void resizeColumns() {
-		for (int i = 0; i < TABLE_HEADER.length; i++) {			
+		for (int i = 0; i < TABLE_HEADER.length; i++) {
 			table.getColumn(i).pack();
 		}
 	}
@@ -181,35 +189,17 @@ public class CalculatorView {
 				GetDataAndAction.getDouble(textArg2.getText())) + "";
 	}
 
-	private SelectionAdapter calculateButtonAdapter = new SelectionAdapter() {
-		public void widgetSelected(SelectionEvent e) {
-			new DividedByZeroDialog(shell, textArg2.getText(), combo.getText());
-			setResult();
-		}
-	};
-
-	private SelectionAdapter checkBoxSelectionAdapter = new SelectionAdapter() {
-		public void widgetSelected(SelectionEvent e) {
-			if (checkbox.getSelection()) {
-				calculateButton.setEnabled(false);
-				resultLabelValue.setText(callCalculate());
-			} else {
-				calculateButton.setEnabled(true);
-			}
-		}
-	};
-
 	public void initHistory() {
 		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
 		tabItem1.setText(HISTORY);
 		SashForm sashForm1 = new SashForm(tabfolder, SWT.HORIZONTAL);
 		tabItem1.setControl(sashForm1);
-	    table = new Table(sashForm1, SWT.BORDER | SWT.V_SCROLL);
+		table = new Table(sashForm1, SWT.BORDER | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		for (int i = 0; i < TABLE_HEADER.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
-			column.setText(TABLE_HEADER[i]);		
+			column.setText(TABLE_HEADER[i]);
 		}
 
 		for (int i = 0; i < TABLE_HEADER.length; i++) {

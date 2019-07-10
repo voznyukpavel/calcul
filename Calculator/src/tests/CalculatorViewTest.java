@@ -139,7 +139,7 @@ class CalculatorViewTest {
 		Method method = TextChecker.class.getDeclaredMethod("checkTextFild",(char[].class));
 		method.setAccessible(true);	
 	
-		String input="--jkjk454";
+		String input="jkj--k454";
 		boolean  requiredOutput = false;
 		
 
