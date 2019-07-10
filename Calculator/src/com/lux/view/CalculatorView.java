@@ -126,15 +126,21 @@ public class CalculatorView {
 		calculateButton.addSelectionListener(calculateButtonAdapter);
 
 		textArg1.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				checker(textArg1);
+
+			public void keyPressed(KeyEvent e) {
+				if (!checker(textArg1.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
+						&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
+					e.doit = false;
+				}
+				textArg1.getCaretPosition();
+				onFlychecker();
 			}
 		});
 
 		textArg2.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				checkDividingByZero();
-				checker(textArg2);
+				// checker(textArg2);
 
 			}
 		});
@@ -148,15 +154,13 @@ public class CalculatorView {
 
 	}
 
-	private boolean checker(Text text) {
+	private boolean checker(String text) {
 
-		String textValue = text.getText();
+		String textValue = text;
 		char[] value = textValue.toCharArray();
-		String checked = TextChecker.checkTextFild(value);
-		text.setText(checked);
-		text.setSelection(text.getText().length());
-		onFlychecker();
-		return true;
+		return TextChecker.checkTextFild(value);
+		// text.setSelection(text.getText().length());
+		// onFlychecker();
 	}
 
 	private void onFlychecker() {
@@ -192,7 +196,7 @@ public class CalculatorView {
 	};
 
 	private void checkDividingByZero() {
-		if (textArg2.getText().equals("0") && combo.getText().equals("/") ) {
+		if (textArg2.getText().equals("0") && combo.getText().equals("/")) {
 			System.out.println(textArg2.getText());
 			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
 			dialog.setText("Incorect insertion");

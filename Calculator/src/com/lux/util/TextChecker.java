@@ -1,44 +1,40 @@
 package com.lux.util;
 
-import org.eclipse.swt.widgets.Text;
 
 public class TextChecker {
 
 	private static final byte ASCII_CODE_DOT = 46;
 	private static final byte ASCII_CODE_MINUS = 45;
 
+    private TextChecker() {
+    	
+    }
+	public static boolean checkTextFild(char[] value) {
 
-	public static String checkTextFild(char[] value) {
-		char[] temp = new char[value.length];
-		int count = 0;
+		boolean process=false;
 		boolean dotPresent = false;
-		for (int i = 0; i < value.length; i++) {
-			if (i == 0 && value[i] == ASCII_CODE_MINUS) {
-				temp[count] = ASCII_CODE_MINUS;
-				count++;
+		boolean minusPresent=false;
+		for (int i = 0; i < value.length; i++) {		
+			process=false;
+			if ((value[i] == ASCII_CODE_MINUS)) {			
+				if (!minusPresent) {
+					minusPresent = true;
+					process=true;
+				}else {
+					return false;
+				}
 			} else if (Character.isDigit(value[i])) {
-				temp[count] = value[i];
-				count++;
+				System.out.println("2ty");
+				process=true;
 			} else if (value[i] == ASCII_CODE_DOT) {
 				if (!dotPresent) {
+					System.out.println("3ty");
 					dotPresent = true;
-					temp[count] = value[i];
-					count++;
+					process=true;
 				}
-			}
+			} 
 		}
-		temp = deleteEmtyElements(temp, count);
-		return String.valueOf(temp);
+		return process;
 	}
 
-	private static char[] deleteEmtyElements(char[] temp, int count) {
-		char[] newArray = new char[count];
-		int counter = 0;
-		for (int i = 0; i < temp.length; i++) {
-			if (temp[i] != 0) {
-				newArray[counter++] = temp[i];
-			}
-		}
-		return newArray;
-	}
 }

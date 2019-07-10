@@ -1,10 +1,11 @@
 package com.lux.util;
 
-
 import com.lux.calculation.Action;
 
 public class GetDataAndAction {
-	
+	private GetDataAndAction() {
+	}
+
 	public static Action getActionByTitle(String title) {
 		Action[] actions = Action.values();
 		for (int i = 0; i < actions.length; i++) {
@@ -15,7 +16,7 @@ public class GetDataAndAction {
 		}
 		throw new RuntimeException("Action Exception");
 	}
-	
+
 	public static String[] getActionsTitles() {
 		Action[] actions = Action.values();
 		String[] result = new String[actions.length];
@@ -25,17 +26,14 @@ public class GetDataAndAction {
 		}
 		return result;
 	}
-	
 
 	public static double getDouble(String text) {
-		double data = 0;
 		try {
-			data = Double.parseDouble(text);
+			return Double.parseDouble(text);
 		} catch (NumberFormatException ex) {
-			data = 0;
+
 		}
-		return data;
+		return 0;
 	}
 
-	
 }
