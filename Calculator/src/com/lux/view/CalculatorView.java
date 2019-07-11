@@ -150,18 +150,14 @@ public class CalculatorView {
 	}
 
 	private boolean isValid(Text textArg1, Text textArg2) {
-
 		if (!TextChecker.checker(textArg1.getText()) && !TextChecker.checker(textArg2.getText())) {
-
 			incorectInsertion("In the both argument filds arguments\n are`nt valid: ",
 					"\n\t the first fild: " + textArg1.getText() + "\n\t the second fild: " + textArg2.getText());
 			return false;
 		} else if (!TextChecker.checker(textArg1.getText())) {
-			
 			incorectInsertion("In the first argument fild the argument \n is`nt valid: ", textArg1.getText());
 			return false;
 		} else if (!TextChecker.checker(textArg2.getText())) {
-			
 			incorectInsertion("In the second argument fild the argument \n is`nt valid:", textArg2.getText());
 			return false;
 		}
@@ -209,10 +205,16 @@ public class CalculatorView {
 
 	private boolean checkDividingByZero(String text, String actionTitle) {
 		if (actionTitle.equals(Action.DIV.getTitle()) && ActionUtils.getDouble(text) == 0) {
-			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
-			dialog.setText("Incorect insertion");
-			dialog.setMessage("Divding by zero is forbidden");
-			dialog.open();
+			String message = "Divding by zero is forbidden";
+			if (!checkbox.getSelection()) {
+				MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
+				dialog.setText("Incorect insertion");
+				dialog.setMessage(message);
+				dialog.open();
+
+			} else {
+				resizeResult(message);
+			}
 			return false;
 		}
 		return true;
@@ -226,7 +228,6 @@ public class CalculatorView {
 			dialog.setMessage(invalidvariable);
 			dialog.open();
 		} else {
-			
 			resizeResult(invalidvariable);
 		}
 	}
@@ -236,7 +237,7 @@ public class CalculatorView {
 		resultLabelValue.setLayoutData(new RowData(240, 60));
 		resultLabelValue.setText(invalidvariable);
 		resultLabelValue.pack();
-		
+
 	}
 
 	ModifyListener listener = new ModifyListener() {
