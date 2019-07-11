@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.lux.calculation.CalculatePlus;
+
+import com.lux.controller.CalculatePlus;
 
 class CalculatePlusTest {
 	private static CalculatePlus calculatorplus;

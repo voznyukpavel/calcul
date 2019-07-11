@@ -1,6 +1,6 @@
 package com.lux.util;
 
-import com.lux.calculation.Action;
+import com.lux.controller.Action;
 
 public class ActionUtils {
 	

@@ -2,8 +2,6 @@ package com.lux.view;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,9 +23,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.lux.calculation.Action;
+import com.lux.controller.Action;
+import com.lux.controller.Controller;
 import com.lux.util.ActionUtils;
-import com.lux.util.TextChecker;
 
 public class CalculatorView {
 
@@ -48,6 +46,15 @@ public class CalculatorView {
 	private Label resultLabelTitle, resultLabelValue;
 	private Table table;
 	private Combo combo;
+	
+	private Controller controller;
+	
+	
+
+	public CalculatorView() {
+		super();
+		controller = new Controller();
+	}
 
 	private void initUICalculator() {
 
@@ -107,7 +114,7 @@ public class CalculatorView {
 			public void widgetSelected(SelectionEvent e) {
 				if (checkbox.getSelection()) {
 					calculateButton.setEnabled(false);
-					setResult(textArg1, textArg2);
+					setResult(textArg1, textArg2,combo);
 				} else {
 					calculateButton.setEnabled(true);
 				}
@@ -116,7 +123,7 @@ public class CalculatorView {
 
 		calculateButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				setResult(textArg1, textArg2);
+				setResult(textArg1, textArg2,combo);
 			}
 		});
 
@@ -125,43 +132,36 @@ public class CalculatorView {
 
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				onFlychecker(textArg1, textArg2);
+				onFlychecker(textArg1, textArg2,combo);
 			}
 		});
 	}
 
-	private void onFlychecker(Text textArg1, Text textArg2) {
+	private void onFlychecker(Text textArg1, Text textArg2,Combo combo) {
 		if (checkbox.getSelection()) {
-			setResult(textArg1, textArg2);
+			setResult(textArg1, textArg2,combo);
 		}
 	}
 
-	private void setResult(Text textArg1, Text textArg2) {
-		if (!isValid(textArg1, textArg2)) {
-			return;
-		} else if (!checkDividingByZero(textArg2.getText(), combo.getText())) {
+	private void setResult(Text textArg1, Text textArg2,Combo combo) {
+		String arg1 = textArg1.getText();
+		String arg2 = textArg2.getText();
+		String actionTitle =combo.getText();
+		String errorMessage = controller.isValid(arg1, arg2);
+		if (!errorMessage.isEmpty()) {
+			showErrorMessage(errorMessage,"Incorect insertion");
 			return;
 		}
-		String value = callCalculate();
+		errorMessage=controller.checkDividingByZero(arg2, actionTitle);
+		if (!errorMessage.isEmpty()) {
+			showErrorMessage(errorMessage,"Dividing by zero");
+			return;
+		}
+		String value = controller.callCalculate(arg1,arg2,actionTitle);
 		resultLabelValue.setText(value);
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setText(new String[] { textArg1.getText(), combo.getText(), textArg2.getText(), value });
 		resizeColumns();
-	}
-
-	private boolean isValid(Text textArg1, Text textArg2) {
-		if (!TextChecker.checker(textArg1.getText()) && !TextChecker.checker(textArg2.getText())) {
-			incorectInsertion("In the both argument filds arguments\n are`nt valid: ",
-					"\n\t the first fild: " + textArg1.getText() + "\n\t the second fild: " + textArg2.getText());
-			return false;
-		} else if (!TextChecker.checker(textArg1.getText())) {
-			incorectInsertion("In the first argument fild the argument \n is`nt valid: ", textArg1.getText());
-			return false;
-		} else if (!TextChecker.checker(textArg2.getText())) {
-			incorectInsertion("In the second argument fild the argument \n is`nt valid:", textArg2.getText());
-			return false;
-		}
-		return true;
 	}
 
 	private void resizeColumns() {
@@ -170,11 +170,6 @@ public class CalculatorView {
 		}
 	}
 
-	private String callCalculate() {
-		Action action = ActionUtils.getActionByTitle(combo.getText());
-		return action.calcExecute(ActionUtils.getDouble(textArg1.getText()), ActionUtils.getDouble(textArg2.getText()))
-				+ "";
-	}
 
 	private void initHistory() {
 		TabItem tabItem1 = new TabItem(tabfolder, SWT.NULL);
@@ -203,48 +198,30 @@ public class CalculatorView {
 		display.dispose();
 	}
 
-	private boolean checkDividingByZero(String text, String actionTitle) {
-		if (actionTitle.equals(Action.DIV.getTitle()) && ActionUtils.getDouble(text) == 0) {
-			String message = "Divding by zero is forbidden";
-			if (!checkbox.getSelection()) {
-				MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
-				dialog.setText("Incorect insertion");
-				dialog.setMessage(message);
-				dialog.open();
 
-			} else {
-				resizeResult(message);
-			}
-			return false;
-		}
-		return true;
-	}
-
-	private void incorectInsertion(String message, String errordata) {
-		String invalidvariable = message + " " + " " + errordata;
+	private void showErrorMessage(String invalidvariable,String title) {
 		if (!checkbox.getSelection()) {
 			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
-			dialog.setText("Incorect insertion");
+			dialog.setText(title);
 			dialog.setMessage(invalidvariable);
 			dialog.open();
 		} else {
-			resizeResult(invalidvariable);
+			resizeOutputLableForError(invalidvariable);
 		}
 	}
 
-	private void resizeResult(String invalidvariable) {
+	private void resizeOutputLableForError(String invalidvariable) {
 		resultLabelValue.setAlignment(SWT.LEFT);
 		resultLabelValue.setLayoutData(new RowData(240, 60));
 		resultLabelValue.setText(invalidvariable);
 		resultLabelValue.pack();
-
 	}
 
 	ModifyListener listener = new ModifyListener() {
 
 		@Override
 		public void modifyText(ModifyEvent e) {
-			onFlychecker(textArg1, textArg2);
+			onFlychecker(textArg1,textArg2,combo);
 		}
 	};
 
