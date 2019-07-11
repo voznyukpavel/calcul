@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -48,6 +50,7 @@ public class CalculatorView {
 	private Combo combo;
 
 	private void initUICalculator() {
+
 		display = new Display();
 		shell = new Shell(display);
 		shell.setText(CALC);
@@ -104,7 +107,7 @@ public class CalculatorView {
 			public void widgetSelected(SelectionEvent e) {
 				if (checkbox.getSelection()) {
 					calculateButton.setEnabled(false);
-					setResult();
+					setResult(textArg1, textArg2);
 				} else {
 					calculateButton.setEnabled(true);
 				}
@@ -113,37 +116,56 @@ public class CalculatorView {
 
 		calculateButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				setResult();
+				setResult(textArg1, textArg2);
 			}
 		});
 
-		textArg1.addKeyListener(listener);
-		textArg2.addKeyListener(listener);
+		textArg1.addModifyListener(listener);
+		textArg2.addModifyListener(listener);
 
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				onFlychecker();
+				onFlychecker(textArg1, textArg2);
 			}
 		});
 	}
 
-	private void onFlychecker() {
+	private void onFlychecker(Text textArg1, Text textArg2) {
 		if (checkbox.getSelection()) {
-			setResult();
+			setResult(textArg1, textArg2);
 		}
 	}
 
-	private void setResult() {
-		
-		if (!checkDividingByZero(shell, textArg2.getText(), combo.getText())) {
+	private void setResult(Text textArg1, Text textArg2) {
+		if (!isValid(textArg1, textArg2)) {
+			return;
+		} else if (!checkDividingByZero(textArg2.getText(), combo.getText())) {
 			return;
 		}
-		
 		String value = callCalculate();
 		resultLabelValue.setText(value);
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setText(new String[] { textArg1.getText(), combo.getText(), textArg2.getText(), value });
 		resizeColumns();
+	}
+
+	private boolean isValid(Text textArg1, Text textArg2) {
+
+		if (!TextChecker.checker(textArg1.getText()) && !TextChecker.checker(textArg2.getText())) {
+
+			incorectInsertion("In the both argument filds arguments\n are`nt valid: ",
+					"\n\t the first fild: " + textArg1.getText() + "\n\t the second fild: " + textArg2.getText());
+			return false;
+		} else if (!TextChecker.checker(textArg1.getText())) {
+			
+			incorectInsertion("In the first argument fild the argument \n is`nt valid: ", textArg1.getText());
+			return false;
+		} else if (!TextChecker.checker(textArg2.getText())) {
+			
+			incorectInsertion("In the second argument fild the argument \n is`nt valid:", textArg2.getText());
+			return false;
+		}
+		return true;
 	}
 
 	private void resizeColumns() {
@@ -185,9 +207,8 @@ public class CalculatorView {
 		display.dispose();
 	}
 
-	private boolean checkDividingByZero(Shell shell, String text, String actionTitle) {
+	private boolean checkDividingByZero(String text, String actionTitle) {
 		if (actionTitle.equals(Action.DIV.getTitle()) && ActionUtils.getDouble(text) == 0) {
-			System.out.println(ActionUtils.getDouble(text));
 			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
 			dialog.setText("Incorect insertion");
 			dialog.setMessage("Divding by zero is forbidden");
@@ -197,18 +218,33 @@ public class CalculatorView {
 		return true;
 	}
 
-	KeyAdapter listener = new KeyAdapter() {
-
-		public void keyPressed(KeyEvent e) {
-			Text text = (Text) e.widget;
-			if (!TextChecker.checker(text.getText() + String.valueOf(e.character)) && e.keyCode != SWT.BS
-					&& e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT) {
-				e.doit = false;
-			}
-			text.getCaretPosition();
-			onFlychecker();
+	private void incorectInsertion(String message, String errordata) {
+		String invalidvariable = message + " " + " " + errordata;
+		if (!checkbox.getSelection()) {
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR | SWT.OK);
+			dialog.setText("Incorect insertion");
+			dialog.setMessage(invalidvariable);
+			dialog.open();
+		} else {
+			
+			resizeResult(invalidvariable);
 		}
+	}
 
+	private void resizeResult(String invalidvariable) {
+		resultLabelValue.setAlignment(SWT.LEFT);
+		resultLabelValue.setLayoutData(new RowData(240, 60));
+		resultLabelValue.setText(invalidvariable);
+		resultLabelValue.pack();
+		
+	}
+
+	ModifyListener listener = new ModifyListener() {
+
+		@Override
+		public void modifyText(ModifyEvent e) {
+			onFlychecker(textArg1, textArg2);
+		}
 	};
 
 	public void open() {
