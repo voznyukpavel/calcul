@@ -16,63 +16,86 @@ class TextCheckerTest {
 	}
 
 	@Test
-	void testcheckTextFildNumbersVsLatersInTheCenter()  {
+	void testcheckTextFildNumbersVsLatersInTheCenter() {
 		String input = "454jkjk745";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildNumbersVsLatersInStart() {
+	@Test
+	void testcheckTextFildNumbersVsLatersInStart() {
 		String input = "jkjk745";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFild1OnlyLaters() {
+	@Test
+	void testcheckTextFild1OnlyLaters() {
 		String input = "jkjk";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildLatersVsNumbersInTheCenter() {
+	@Test
+	void testcheckTextFildLatersVsNumbersInTheCenter() {
 		String input = "jkjk745jh";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildOnlyNumbers(){
+	@Test
+	void testcheckTextFildOnlyNumbers() {
 		String input = "745";
 		boolean requiredOutput = true;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildEmpty() {
+	@Test
+	void testcheckTextFildEmpty() {
 		String input = "";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildOnePoint() {
+	@Test
+	void testcheckTextFildOnePoint() {
 		String input = ".";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildTwoPoints(){
+	@Test
+	void testcheckTextFildTwoPoints() {
 		String input = "..";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildTwoMinus(){
+	@Test
+	void testcheckTextFildTwoMinus() {
 		String input = "--858";
 		boolean requiredOutput = false;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
-	@Test void testcheckTextFildNumbersVsD() {
+	@Test
+	void testcheckTextFildNumbersVsD() {
 		String input = "858D";
 		boolean requiredOutput = false;
+		assertEquals(requiredOutput, TextChecker.checker(input));
+	}
+
+	@Test
+	void testcheckTextFildNumbersVsF() {
+		String input = "858F";
+		boolean requiredOutput = false;
+		assertEquals(requiredOutput, TextChecker.checker(input));
+	}
+
+	@Test
+	void testcheckTextFildNumbersVsMinus() {
+		String input = "-858";
+		boolean requiredOutput = true;
 		assertEquals(requiredOutput, TextChecker.checker(input));
 	}
 
