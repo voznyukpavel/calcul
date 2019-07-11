@@ -3,8 +3,9 @@ package com.lux.view.calculatorUI;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -22,25 +23,34 @@ public class CalculatorActionsUI extends Composite{
 	private static CalculatorArgumentsUI calculatorArgumentsUI;
 	
 
-	public CalculatorActionsUI(Composite parent, int style,RowLayout layout,CalculatorArgumentsUI calculatorArgumentsUI) {
+	public CalculatorActionsUI(Composite parent, int style,GridLayout layout,CalculatorArgumentsUI calculatorArgumentsUI) {
 		super(parent, style);
 		CalculatorActionsUI.calculatorArgumentsUI=calculatorArgumentsUI;
-		layout= new RowLayout();
-		layout.wrap = false;
 		setLayout(layout);
 		initUI();
 		initListeners();
 		
 	}
 	private void initUI(){
+		GridData gridDataCheckBox= new GridData();
+		gridDataCheckBox.horizontalSpan=2;
+		gridDataCheckBox.grabExcessHorizontalSpace=true;
+		gridDataCheckBox.grabExcessVerticalSpace=true;
+		gridDataCheckBox.horizontalAlignment = GridData.FILL;
 		
 		checkbox = new Button(this, SWT.CHECK);
-		checkbox.setLayoutData(new RowData(150, 70));
 		checkbox.setText(CALCULATE_ON_THE_FLY);
+		checkbox.setLayoutData(gridDataCheckBox);
+		
+		GridData gridDataButton= new GridData();
+		gridDataButton.grabExcessHorizontalSpace=true;
+		gridDataButton.grabExcessVerticalSpace=true;
+		gridDataButton.horizontalAlignment = GridData.FILL;
 		
 		calculateButton = new Button(this, SWT.PUSH);
 		calculateButton.setText(CALCULATE);
-		calculateButton.setLayoutData(new RowData(140, 35));
+		calculateButton.setLayoutData(gridDataButton);
+
 	}
 	
 	private void initListeners() {

@@ -3,7 +3,7 @@ package com.lux.view;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridLayout;
 
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
@@ -26,10 +26,12 @@ public class CalculatorView {
 	
 	private Display display;
 	private static Shell shell;
-	private RowLayout rowlayout;
+	private GridLayout gridlayout;
 	private static CalculatorArgumentsUI calculatorArgumentsUI;
 	private TabFolder tabfolder;
 	private static Controller controller;
+	
+	
 	public CalculatorView() {
 		super();	
 	}
@@ -41,8 +43,7 @@ public class CalculatorView {
 		shell.setText(CALC);
 		shell.setLayout(new FillLayout());
 
-		rowlayout = new RowLayout();
-		rowlayout.wrap = false;
+		gridlayout = new GridLayout(3,true);
 
 		tabfolder = new TabFolder(shell, SWT.NONE);
 		TabItem tabItem = new TabItem(tabfolder, SWT.NONE);
@@ -51,9 +52,9 @@ public class CalculatorView {
 		SashForm sashForm = new SashForm(tabfolder, SWT.VERTICAL);
 		tabItem.setControl(sashForm);
 
-		calculatorArgumentsUI=new CalculatorArgumentsUI(sashForm, SWT.NONE,rowlayout);	
-		new CalculatorActionsUI(sashForm, SWT.NONE,rowlayout,calculatorArgumentsUI);
-		new CalculatorResultUI(sashForm, SWT.NONE,rowlayout);
+		calculatorArgumentsUI=new CalculatorArgumentsUI(sashForm, SWT.NONE,gridlayout);	
+		new CalculatorActionsUI(sashForm, SWT.NONE,gridlayout,calculatorArgumentsUI);
+		new CalculatorResultUI(sashForm, SWT.NONE,gridlayout);
 	}
 	
 	private void initHistory() {		
@@ -62,7 +63,6 @@ public class CalculatorView {
 		
 		SashForm sashForm1 = new SashForm(tabfolder, SWT.HORIZONTAL);
 		tabItem1.setControl(sashForm1);	
-		
 		new HistoryUI(sashForm1, SWT.NONE);
 	}
 
@@ -106,11 +106,11 @@ public class CalculatorView {
 			CalculatorResultUI.resizeOutputLableForError(invalidvariable);
 		}
 	}
-
+	
 	public void open() {
 		initUICalculator();
 		initHistory();
 		openWindow();
 	}
-
+	
 }

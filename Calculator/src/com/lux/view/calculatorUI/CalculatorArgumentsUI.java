@@ -5,8 +5,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -19,10 +19,8 @@ public class CalculatorArgumentsUI extends Composite{
 	private Text textArg1,textArg2;
 	private Combo combo;
 	
-	public CalculatorArgumentsUI(Composite parent, int style,RowLayout layout) {
+	public CalculatorArgumentsUI(Composite parent, int style,GridLayout layout) {
 		super(parent, style);
-		layout= new RowLayout();
-		layout.wrap = false;
 		setLayout(layout);
 		initUI();
 		initListeners();
@@ -30,19 +28,27 @@ public class CalculatorArgumentsUI extends Composite{
 	
 	private void initUI() {
 		
-		RowData rowdata = new RowData();
-		rowdata.width = 110;
-		rowdata.height = 20;
-		
+
+		GridData gridDataArgs= new GridData();
+		gridDataArgs.grabExcessHorizontalSpace=true;
+		gridDataArgs.grabExcessVerticalSpace=true;
+		gridDataArgs.horizontalAlignment = GridData.FILL;
+
 		textArg1 = new Text(this, SWT.BORDER | SWT.RIGHT);
-		textArg1.setLayoutData(rowdata);
+		textArg1.setLayoutData(gridDataArgs);
+		
+		GridData gridDataCombo= new GridData();
+		gridDataCombo.grabExcessHorizontalSpace=true;
+		gridDataCombo.grabExcessVerticalSpace=true;
+		gridDataCombo.horizontalAlignment = GridData.FILL;		
 		
 		combo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.setItems(ActionUtils.getActionsTitles());
 		combo.setText(Action.ADD.getTitle());
+		combo.setLayoutData(gridDataCombo);
 		
 		textArg2 = new Text(this, SWT.BORDER | SWT.RIGHT);
-		textArg2.setLayoutData(rowdata);
+		textArg2.setLayoutData(gridDataArgs);
 
 	}
 		
@@ -66,20 +72,13 @@ public class CalculatorArgumentsUI extends Composite{
 	public Text getTextArg1() {
 		return textArg1;
 	}
-	public void setTextArg1(Text textArg1) {
-		this.textArg1 = textArg1;
-	}
+
 	public Text getTextArg2() {
 		return textArg2;
 	}
-	public void setTextArg2(Text textArg2) {
-		this.textArg2 = textArg2;
-	}
+
 	public Combo getCombo() {
 		return combo;
-	}
-	public void setCombo(Combo combo) {
-		this.combo = combo;
 	}
 
 }
