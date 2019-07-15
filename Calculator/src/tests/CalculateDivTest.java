@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.lux.controller.CalculateDiv;
+import com.lux.calculator.logic.CalculateDiv;
 
 class CalculateDivTest {
 

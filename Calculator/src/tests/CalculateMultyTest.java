@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.lux.controller.CalculateMulty;
+import com.lux.calculator.logic.CalculateMulty;
 
 class CalculateMultyTest {
 

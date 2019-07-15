@@ -1,4 +1,4 @@
-package com.lux.controller;
+package com.lux.calculator.logic;
 
 public class CalculateDiv implements Calculate {
 	@Override

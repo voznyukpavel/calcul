@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.lux.util.TextChecker;
+import com.lux.calculator.util.TextChecker;
 
 class TextCheckerTest {
 

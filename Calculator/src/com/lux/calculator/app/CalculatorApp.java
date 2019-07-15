@@ -1,6 +1,6 @@
-package com.lux.app;
+package com.lux.calculator.app;
 
-import com.lux.view.CalculatorView;
+import com.lux.calculator.ui.CalculatorView;
 
 public class CalculatorApp {
 

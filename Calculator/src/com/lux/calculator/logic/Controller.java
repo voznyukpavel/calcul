@@ -1,8 +1,6 @@
-package com.lux.controller;
+package com.lux.calculator.logic;
 
-
-import com.lux.util.ActionUtils;
-import com.lux.util.TextChecker;
+import com.lux.calculator.util.TextChecker;
 
 public class Controller {
 
@@ -21,15 +19,24 @@ public class Controller {
 	}
 
 	public String checkDividingByZero(String text, String actionTitle) {
-		if (actionTitle.equals(Action.DIV.getTitle()) && ActionUtils.getDouble(text) == 0) {
+		if (actionTitle.equals(Action.DIV.getTitle()) && getDouble(text) == 0) {
 			return "Divding by zero is forbidden";
 		}
 		return "";
 	}
 
 	public String callCalculate(String arg1, String arg2,String actionTitle) {
-		Action action = ActionUtils.getActionByTitle(actionTitle);
-		return action.calcExecute(ActionUtils.getDouble(arg1), ActionUtils.getDouble(arg2))
+		Action action = Action.getActionByTitle(actionTitle);
+		return action.calcExecute(getDouble(arg1), getDouble(arg2))
 				+ "";
 	}
+	
+	private double getDouble(String text) {
+		try {
+			return Double.parseDouble(text);
+		} catch (NumberFormatException ex) {
+		}
+		return 0;
+	}
+
 }

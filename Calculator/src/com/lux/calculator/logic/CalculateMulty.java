@@ -1,4 +1,4 @@
-package com.lux.controller;
+package com.lux.calculator.logic;
 
 public class CalculateMulty implements Calculate {
 	@Override
